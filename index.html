@@ -1,53 +1,333 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Japanese N5 Verb Quiz</title>
+<html lang="my">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ဂျပန်ကြိယာ လမ်းညွှန်နှင့် Game Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <style>
-      body {
-        font-family: 'M PLUS Rounded 1c', 'Noto Sans Myanmar', sans-serif;
-        background-color: #F8F7FA;
-        color: #1a1a1a;
-        overflow-x: hidden;
-      }
-      
-      .card-shadow {
-        box-shadow: 0px 8px 24px rgba(23, 31, 77, 0.08), 0px 2px 8px rgba(23, 31, 77, 0.06);
-      }
-      
-      @keyframes pop-in {
-        0% {
-          opacity: 0;
-          transform: translateY(20px) scale(0.95);
-        }
-        100% {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-      }
-      .animate-pop-in {
-        animation: pop-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
-    "react/": "https://esm.sh/react@^19.1.0/",
-    "react": "https://esm.sh/react@^19.1.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
-  <body>
-    <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
+
+<body class="bg-slate-100">
+    <main class="flex items-center justify-center p-2 md:p-4">
+        <div id="app-container" class="w-full max-w-3xl mx-auto">
+            <div id="user-form-panel" class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+                <div class="text-center mb-6">
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800">ဂျပန်ကြိယာ လေ့လာကြမယ်</h1>
+                    <p class="text-slate-500 mt-2">ဂိမ်းမစခင် အချက်အလက်ဖြည့်စွက်ပေးပါ။</p>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label for="user-name-input" class="block mb-2 font-semibold text-slate-700">အမည်</label>
+                        <input type="text" id="user-name-input" placeholder="သင်၏အမည်ကိုထည့်ပါ"
+                            class="w-full p-3 text-lg border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="level-input" class="block mb-2 font-semibold text-slate-700">ဂျပန်စာ
+                            အရည်အချင်းအဆင့်</label>
+                        <input type="text" id="level-input" placeholder="ဥပမာ: N5, N4"
+                            class="w-full p-3 text-lg border-2 border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <button id="start-game-btn"
+                        class="w-full btn-primary font-bold py-3 rounded-lg text-lg mt-4">ဂိမ်းစရန်</button>
+                </div>
+            </div>
+
+            <div id="main-game-container" class="bg-white rounded-2xl shadow-xl p-4 md:p-6 hidden">
+                <div class="text-center mb-4">
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800">ဂျပန်ကြိယာ လေ့လာကြမယ်</h1>
+                    <p class="text-slate-500 mt-1">ပုံစံပြောင်းနည်းလမ်းညွှန်နှင့် Game Quiz</p>
+                </div>
+
+                <div class="flex border-b border-gray-200 mb-4">
+                    <button id="tab-quiz"
+                        class="tab-btn flex-1 py-3 px-2 md:px-4 font-bold text-base md:text-lg rounded-t-lg active">ကစားရန်
+                        (Quiz)</button>
+                    <button id="tab-guide"
+                        class="tab-btn flex-1 py-3 px-2 md:px-4 font-bold text-base md:text-lg rounded-t-lg">လမ်းညွှန်
+                        (Guide)</button>
+                </div>
+
+                <div id="panel-quiz">
+                    <div id="quiz-main-view">
+                        <div class="flex justify-between items-center bg-blue-50 rounded-lg p-3 mb-4">
+                            <div class="text-base md:text-lg"><span class="font-semibold text-slate-700">အမှတ်:</span>
+                                <span id="score" class="font-bold text-blue-600">0</span></div>
+                            <div class="text-base md:text-lg"><span
+                                    class="font-semibold text-slate-700">မေးခွန်း:</span> <span id="question-count"
+                                    class="font-bold text-blue-600">0 / 106</span></div>
+                        </div>
+                        <div id="question-card"
+                            class="bg-slate-50 rounded-lg p-5 text-center mb-4 min-h-[120px] flex flex-col justify-center">
+                            <p class="text-lg md:text-xl text-slate-600 mb-2">"<strong id="verb-start"
+                                    class="text-xl md:text-2xl text-blue-700 font-bold"></strong>" ၏ <strong
+                                    id="form-type" class="text-xl md:text-2xl text-red-500 font-bold"></strong>
+                                ကိုရွေးပါ။</p>
+                            <p class="text-base md:text-md text-slate-500" id="verb-meaning"></p>
+                        </div>
+
+                        <div id="flashcard-options" class="grid grid-cols-2 gap-3 md:gap-4 mb-4"></div>
+                        <div id="feedback" class="text-center min-h-[2.5rem] mb-4 text-lg font-semibold"></div>
+                        <div id="button-group">
+                            <button id="next-btn"
+                                class="w-full btn-secondary font-bold py-3 rounded-lg text-lg hidden">နောက်တစ်ပုဒ်</button>
+                        </div>
+                    </div>
+                    <div id="end-game-screen" class="text-center hidden p-4 md:p-6">
+                        <div id="trophy-icon" class="text-6xl mb-4 animate-bounce">🏆</div>
+                        <h2 id="congrats-message" class="text-2xl md:text-3xl font-bold text-yellow-500 mb-2">
+                            ဂုဏ်ယူပါတယ်!</h2>
+                        <p class="text-xl text-slate-700 mb-4">ဂိမ်းပြီးဆုံးသွားပါပြီ။</p>
+                        <div class="bg-blue-100 rounded-lg p-4 mb-6">
+                            <p class="text-lg text-slate-600">စုစုပေါင်းရမှတ်</p>
+                            <p id="final-score" class="text-4xl font-bold text-blue-600"></p>
+                            <p id="score-percentage" class="text-md text-slate-500 mt-1"></p>
+                        </div>
+                        <button id="restart-btn"
+                            class="w-full btn-primary font-bold py-3 rounded-lg text-lg">အစမှပြန်ကစားရန်</button>
+                    </div>
+                </div>
+
+                <div id="panel-guide" class="hidden">
+                    <div class="guide-content p-2 leading-relaxed">
+                        <h3>ကြိယာအုပ်စုခွဲနည်း (Verb Categorization)</h3>
+                        <p>ဂျပန်ကြိယာများကို အုပ်စု ၁၊ ၂၊ ၃ ဟူ၍ ခွဲခြားထားပြီး အုပ်စုပေါ်မူတည်၍ ပုံစံပြောင်းလဲပုံ
+                            ကွာခြားပါသည်။ အုပ်စုမှန်မှန်ကန်ကန်ခွဲခြားနိုင်ရန် အလွန်အရေးကြီးပါသည်။</p>
+
+                        <h4>၁။ ます形 မှ အုပ်စုခွဲနည်း</h4>
+                        <p>ます ၏ ရှေ့ကစာလုံး (အသံ) ကိုကြည့်၍ အုပ်စုခွဲခြားနိုင်ပါသည်။</p>
+                        <div class="overflow-x-auto shadow-md rounded-lg">
+                            <table class="hiragana-chart">
+                                <tr>
+                                    <td class="highlight-i">い (i)</td>
+                                    <td class="highlight-i">き</td>
+                                    <td class="highlight-i">し</td>
+                                    <td class="highlight-i">ち</td>
+                                    <td class="highlight-i">に</td>
+                                    <td class="highlight-i">ひ</td>
+                                    <td class="highlight-i">み</td>
+                                    <td class="highlight-i">り</td>
+                                </tr>
+                                <tr>
+                                    <td class="highlight-e">え (e)</td>
+                                    <td class="highlight-e">け</td>
+                                    <td class="highlight-e">せ</td>
+                                    <td class="highlight-e">て</td>
+                                    <td class="highlight-e">ね</td>
+                                    <td class="highlight-e">へ</td>
+                                    <td class="highlight-e">め</td>
+                                    <td class="highlight-e">れ</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="overflow-x-auto shadow-md rounded-lg mt-4">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>အုပ်စု</th>
+                                        <th>ခွဲခြားနည်း</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Group 2</td>
+                                        <td>ます ရှေ့ကအသံသည် <span class="rule">え (e) သံတန်း</span> (အပေါ်ဇယား
+                                            အစိမ်းရောင်တန်း) ဖြစ်လျှင် အမြဲတမ်း Group 2 ဖြစ်သည်။<br><span
+                                                class="example">たべます、おしえます、でかけます</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 1 or 2</td>
+                                        <td>ます ရှေ့ကအသံသည် <span class="rule">い (i) သံတန်း</span> (အပေါ်ဇယား
+                                            အပြာရောင်တန်း) ဖြစ်လျှင် Group 1 သို့မဟုတ် Group 2 ဖြစ်နိုင်သည်။
+                                            ခြွင်းချက်များကို မှတ်သားရန်လိုအပ်သည်။</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 3</td>
+                                        <td><span class="example">します</span> နှင့် <span class="example">きます</span>
+                                            နှစ်လုံးတည်းသာဖြစ်သည်။</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>"い" သံတန်းအတွက် ခြွင်းချက်များ</h4>
+                        <div class="overflow-x-auto shadow-md rounded-lg">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>အုပ်စု</th>
+                                        <th>ဥပမာများ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Group 2 (စည်းမျဉ်းအတိုင်း)</td>
+                                        <td>တစ်လုံးတည်းသော ဟီရာဂါနာ + ます<br><span
+                                                class="example">みます、います</span><br><br>အခြား Group 2 ကြိယာများ<br><span
+                                                class="example">おきます、おります、あびます、かります</span></td>
+                                    </tr>
+                                    <tr class="exception">
+                                        <td>Group 1 (ခြွင်းချက်)</td>
+                                        <td>အောက်ပါကြိယာများသည် Group 2 ပုံစံပေါက်သော်လည်း Group 1 ဖြစ်သည်။<br><span
+                                                class="example">かえります、はいります、しります、きります、はしります、いります(လိုအပ်သည်)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>辞書形 မှ အုပ်စုခွဲနည်း</h3>
+                        <p>ကြိယာ၏ အဆုံးသတ်ပုံစံကို ကြည့်၍ အုပ်စုခွဲခြားနိုင်ပါသည်။</p>
+                        <div class="overflow-x-auto shadow-md rounded-lg">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>အုပ်စု</th>
+                                        <th>ခွဲခြားနည်း</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Group 2</td>
+                                        <td>အဆုံးသတ်သည် <span class="rule">る</span> ဖြစ်ပြီး၊ <span
+                                                class="rule">る</span> ၏ရှေ့ကအသံသည် <span class="rule">い</span> သို့မဟုတ်
+                                            <span class="rule">え</span> သံတန်းဖြစ်လျှင် Group 2 ဖြစ်သည်။
+                                            (ခြွင်းချက်များမှလွဲ၍)<br><span class="example">たべる (べ-e), みる (み-i), おきる
+                                                (き-i)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 1</td>
+                                        <td>၁။ <span class="rule">る</span> ဖြင့် မဆုံးသောကြိယာများအားလုံး။<br><span
+                                                class="example">かく, のむ, あう</span><br>၂။ <span class="rule">る</span>
+                                            ဖြင့်ဆုံးသော်လည်း၊ ရှေ့ကအသံသည် <span class="rule">い/え</span> သံတန်းမဟုတ်သော
+                                            ကြိယာများ။<br><span class="example">つくる (く-u), のぼる (ぼ-o)</span><br>၃။ <span
+                                                class="rule">る</span> ဖြင့်ဆုံးပြီး ရှေ့က <span class="rule">い/え</span>
+                                            သံဖြစ်သော်လည်း Group 1 ဖြစ်သော ခြွင်းချက်များ။<br><span class="example">かえる,
+                                                はいる, しる, きる</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 3</td>
+                                        <td><span class="example">する</span> နှင့် <span class="example">くる</span>
+                                            နှစ်လုံးတည်းသာဖြစ်သည်။</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>ပုံစံပြောင်းနည်းများ</h3>
+                        <h4>၁။ 辞書形 → ます形</h4>
+                        <div class="overflow-x-auto shadow-md rounded-lg">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>အုပ်စု</th>
+                                        <th>ပြောင်းလဲနည်း</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Group 1</td>
+                                        <td>အဆုံးမှ <span class="rule">う</span> သံကို <span class="rule">い</span>
+                                            သံပြောင်းပြီး ます ပေါင်းပါ။ <br><span class="example">かく → かきます</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 2</td>
+                                        <td>အဆုံးမှ <span class="rule">る</span> ကိုဖြုတ်ပြီး ます ပေါင်းပါ။ <br><span
+                                                class="example">たべる → たべます</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 3</td>
+                                        <td><span class="example">する → します</span>, <span class="example">くる → きます</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>၂။ 辞書形 → ない形</h4>
+                        <div class="overflow-x-auto shadow-md rounded-lg">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>အုပ်စု</th>
+                                        <th>ပြောင်းလဲနည်း</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Group 1</td>
+                                        <td>အဆုံးမှ <span class="rule">う</span> သံကို <span class="rule">あ</span>
+                                            သံပြောင်းပြီး ない ပေါင်းပါ။ <br><span class="example">かく → かかない</span>
+                                            <br>ခြွင်းချက်: う ဖြင့်ဆုံးလျှင် <span class="rule">わない</span> ဖြစ်မည်။
+                                            <span class="example">かう → かわない</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 2</td>
+                                        <td>အဆုံးမှ <span class="rule">る</span> ကိုဖြုတ်ပြီး ない ပေါင်းပါ။ <br><span
+                                                class="example">たべる → たべない</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 3</td>
+                                        <td><span class="example">する → しない</span>, <span class="example">くる → こない</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h4>၃။ 辞書形 → て形</h4>
+                        <div class="overflow-x-auto shadow-md rounded-lg">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>အုပ်စု</th>
+                                        <th>ပြောင်းလဲနည်း</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Group 1</td>
+                                        <td>အဆုံးသတ်စာလုံးပေါ်မူတည်၍ ပြောင်းလဲပါသည်။<br>
+                                            ・う, つ, る → <span class="rule">って</span> (<span
+                                                class="example">かう→かって</span>)<br>
+                                            ・む, ぶ, ぬ → <span class="rule">んで</span> (<span
+                                                class="example">よむ→よんで</span>)<br>
+                                            ・く → <span class="rule">いて</span> (<span class="example">かく→かいて</span>)<br>
+                                            ・ぐ → <span class="rule">いで</span> (<span
+                                                class="example">およぐ→およいで</span>)<br>
+                                            ・す → <span class="rule">して</span> (<span
+                                                class="example">はなす→はなして</span>)<br>
+                                            ・ခြွင်းချက်: <span class="example">いく → いって</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 2</td>
+                                        <td>အဆုံးမှ <span class="rule">る</span> ကိုဖြုတ်ပြီး て ပေါင်းပါ။<br><span
+                                                class="example">たべる → たべて</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Group 3</td>
+                                        <td><span class="example">する → して</span>, <span class="example">くる → きて</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="bg-slate-800 text-white text-center p-4 mt-6">
+        <p class="font-bold">Developer: winpaing</p>
+        <p>Email: sysadm.winpaingsoe@gmail.com | Phone: 0619623368</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
+
 </html>

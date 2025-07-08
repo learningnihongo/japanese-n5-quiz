@@ -1,0 +1,92 @@
+body {
+    font-family: 'Padauk', sans-serif;
+    touch-action: manipulation;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main {
+    flex-grow: 1;
+}
+.tab-btn {
+    transition: background-color 0.3s, color 0.3s;
+}
+.tab-btn.active {
+    background-color: #3b82f6;
+    color: white;
+}
+.tab-btn:not(.active) {
+    background-color: #e5e7eb;
+    color: #4b5563;
+}
+.guide-content h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1e3a8a;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 3px solid #60a5fa;
+    padding-bottom: 0.5rem;
+}
+ .guide-content h4 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #1e40af;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+.guide-content table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+.guide-content th, .guide-content td {
+    border: 1px solid #d1d5db;
+    padding: 0.75rem;
+    text-align: left;
+    vertical-align: top;
+}
+.guide-content th {
+    background-color: #f3f4f6;
+    font-weight: bold;
+}
+.guide-content .example { color: #1d4ed8; font-weight: bold; }
+.guide-content .rule { color: #be123c; font-weight: bold; }
+.guide-content .exception { background-color: #fef9c3; }
+.guide-content .hiragana-chart td { text-align: center; font-size: 1.1rem; }
+.guide-content .highlight-i { background-color: #e0f2fe; }
+.guide-content .highlight-e { background-color: #dcfce7; }
+
+.flashcard-btn {
+    background-color: white;
+    border: 2px solid #d1d5db;
+    transition: all 0.2s ease-in-out;
+    min-height: 80px;
+}
+.flashcard-btn:hover:not(:disabled) {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.flashcard-btn.correct {
+    background-color: #dcfce7;
+    border-color: #22c55e;
+    color: #15803d;
+}
+.flashcard-btn.incorrect {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+    color: #b91c1c;
+}
+.flashcard-btn:disabled {
+    cursor: not-allowed;
+}
+
+.feedback-correct { color: #16a34a; }
+.feedback-incorrect { color: #dc2626; }
+.btn-primary { background-color: #3b82f6; color: white; transition: background-color 0.3s; }
+.btn-primary:hover { background-color: #2563eb; }
+.btn-secondary { background-color: #6b7280; color: white; transition: background-color: 0.3s; }
+.btn-secondary:hover { background-color: #4b5563; }
